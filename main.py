@@ -7,12 +7,18 @@ Probabilities of letter, syllable and words.
 - The state of AI today (2025);
 """
 
+import tree
+
 alphabet: dict[str, dict[str, list[str]]] = {
 	'fr': {
 		'lower': ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
 		'vowels': ['a', 'e', 'i', 'o', 'u', 'y']
 	}
 }
+
+
+
+
 
 
 class Search:
@@ -45,6 +51,10 @@ class Search:
 				'vowel': 0,
 			}
 		}
+		results_depth = 1
+		results_root_name = "total"
+		results_outcomes = ["consonant", "vowel", "space"]
+		_results: tree.Branch = tree.Branch(results_outcomes, results_depth+1, results_root_name)
 		i: int = 0
 
 		# Main loop
