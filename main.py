@@ -31,5 +31,6 @@ if __name__ == '__main__':
 	print(f'## Usage in text recognition')
 
 	text_simple_1: str = "Salut tout le monde !"
-	result_simple_1: dict[str, dict[str, int]] = vowels.Search.chain_vowels(text_simple_1, alphabets['fr'])
-	vowels.Search.chain_vowels_display(result_simple_1, len(text_simple_1))
+	search_vowels_fr: vowels.SearchVowels = vowels.SearchVowels(depth=2, alphabet=alphabets["fr"])
+	search_vowels_fr.analyse(text_simple_1)
+	search_vowels_fr.display_all_children()

@@ -5,61 +5,75 @@ Search vowels
 
 import tree
 import natural_language as lang
+# from typing_extensions import Self
 
-class Search:
+
+class SearchVowels(tree.Branch):
 	"""
 	Contain all search static methods, for the sake of organization.
 	"""
-	@staticmethod
-	def chain_vowels(text: str, alphabet: lang.Alphabet) -> dict[str, dict[str, int]]:
+
+	def __init__(self, depth: int, alphabet: lang.Alphabet) -> None:
+		self.outcomes: list[str] = ["vowel", "consonant", "space", "special"]
+		self.alphabet: lang.Alphabet = alphabet
+		self.root_name: str = "total"
+		self.root_position: int = 0
+		super().__init__(self.outcomes, depth, self.root_name, self.root_position)
+
+	def analyse(self, text: str) -> tree.Branch:
 		"""
-		Function: Establish the probability chain from moving between consonants and vowels
+		Function: Establish the probability chain from moving between consonants and vowels. Additive to previous results
 		:param text: string to analyze.
 		:param alphabet: entire alphabet structure that contain all letters, and all vowels.
 		:returns: Dictionary containing the total number of character and the number of travels between each combinations.
 
 		"""
-		# Vars
-		results: dict[str, dict[str, int]] = {
-			'consonant': {
-				'consonant': 0,
-				'vowel': 0
-			},
-			'vowel': {
-				'consonant': 0,
-				'vowel': 0,
-			}
-		}
-		results_depth = 1
-		results_root_name = "total"
-		results_outcomes = ["consonant", "vowel", "space"]
-		_results: tree.Branch = tree.Branch(results_outcomes, results_depth+1, results_root_name)
-		i: int = 0
-
 		# Main loop
-		while i < len(text) - 1:
-			char_0: str = text[i]
-			char_1: str = text[i + 1]
-
-			if char_0 in alphabet.vowels:
-				if char_1 in alphabet.vowels:
-					results['vowel']['vowel'] += 1
-				else:
-					results['vowel']['consonant'] += 1
+		reader_index: int = 0
+		while reader_index < len(text) - 1:
+			# Get the characters
+			char_0: str = text[reader_index]
+			char_1: str = text[reader_index + 1]
+			# If both spaces, skip
+			if char_0.lower() not in self.alphabet.lowers and char_1.lower() not in self.alphabet.lowers:
+				pass
 			else:
-				if char_1 in alphabet.vowels:
-					results['consonant']['vowel'] += 1
-				else:
-					results['consonant']['consonant'] += 1
+				# Saving the combination
+				self.update_tree([char_0, char_1])
 
-			i += 1
+			reader_index += 1
 
-		return results
+		return self
+	
+	def update_tree(self, list_cases: list[str], branch_in: tree.Branch|None = None):
+		# Default
+		branch: tree.Branch
+		if branch_in is None:
+			branch = self
+		else:
+			branch = branch_in
 
-	@staticmethod
-	def chain_vowels_display(result: dict[str, dict[str, int]], text_length: int):
-		print(f"Search vowel chain results, for a text of length {text_length}: ")
-		print(f"- Vowel -> Vowel = {result['vowel']['vowel'] / text_length:.2%} ({result['vowel']['vowel']})")
-		print(f"- Vowel -> Consonant = {result['vowel']['consonant'] / text_length:.2%} ({result['vowel']['consonant']})")
-		print(f"- Consonant -> Vowel = {result['consonant']['vowel'] / text_length:.2%} ({result['consonant']['vowel']})")
-		print(f"- Consonant -> Consonant = {result['consonant']['consonant'] / text_length:.2%} ({result['consonant']['consonant']})")
+		# Handle each case, for the vowel based search
+		event_name: str
+		case_value: str = list_cases[0].lower()
+		if case_value in self.alphabet.vowels:
+			event_name = self.outcomes[0]
+		elif case_value in self.alphabet.consonants:
+			event_name = self.outcomes[1]
+		elif case_value in self.alphabet.spaces:
+			event_name = self.outcomes[2]
+		else:
+			event_name = self.outcomes[3]
+		# Get next branch
+		branch = branch.get_branch(event_name)
+		branch.value += 1
+		list_cases.pop(0)
+		# Recursion
+		if len(list_cases) > 0:
+			self.update_tree(list_cases, branch)
+
+
+if __name__ == "__main__":
+	print("MARKOV CHAIN.")
+	print("Vowels testing")
+

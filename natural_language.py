@@ -2,13 +2,20 @@
 MARKOV CHAIN
 Natural languages specifications
 """
+from dataclasses import dataclass
 
-
+@dataclass(frozen=False, order=False)
 class Alphabet:
-	def __init__(self, lowers: list[str], vowels: list[str]) -> None:
-		self.lowers: list[str] = lowers
-		self.uppers: list[str] = [letter.upper() for letter in self.lowers] 
-		self.vowels: list[str] = vowels
-		self.consonnants: list[str] = [letter for letter in lowers if letter not in self.vowels]
-	
+	lowers: list[str]
+	uppers: list[str]
+	vowels: list[str]
+	consonants: list[str]
+	spaces: list[str]
+
+	def __init__(self, lowers: list[str], vowels: list[str], spaces: list[str] = [" "]) -> None:
+		self.lowers = [letter.lower() for letter in lowers]
+		self.uppers = [letter.upper() for letter in self.lowers] 
+		self.vowels = [letter.lower() for letter in vowels] 
+		self.consonants = [letter.lower() for letter in lowers if letter not in self.vowels]
+		self.spaces = spaces
 
