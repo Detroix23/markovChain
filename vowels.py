@@ -2,7 +2,7 @@
 MARKOV CHAIN
 Search vowels
 """
-
+import random
 import tree
 import natural_language as lang
 # from typing_extensions import Self
@@ -20,6 +20,19 @@ class SearchVowels(tree.Branch):
 		self.root_position: int = 0
 		super().__init__(self.outcomes, depth, self.root_name, self.root_position)
 
+	def case_map(self, case_value: str) -> str:
+		event_name: str
+		if case_value in self.alphabet.vowels:
+			event_name = self.outcomes[0]
+		elif case_value in self.alphabet.consonants:
+			event_name = self.outcomes[1]
+		elif case_value in self.alphabet.spaces:
+			event_name = self.outcomes[2]
+		else:
+			event_name = self.outcomes[3]
+		
+		return event_name
+
 	def analyse(self, text: str) -> tree.Branch:
 		"""
 		Function: Establish the probability chain from moving between consonants and vowels. Additive to previous results
@@ -28,6 +41,8 @@ class SearchVowels(tree.Branch):
 		:returns: Dictionary containing the total number of character and the number of travels between each combinations.
 
 		"""
+		# Setting the `root` value, considering the text to be clean (no double space, no spaces at the end,...).
+		self.value += len(text)
 		# Main loop
 		reader_index: int = 0
 		while reader_index < len(text) - 1:
@@ -54,16 +69,9 @@ class SearchVowels(tree.Branch):
 			branch = branch_in
 
 		# Handle each case, for the vowel based search
-		event_name: str
 		case_value: str = list_cases[0].lower()
-		if case_value in self.alphabet.vowels:
-			event_name = self.outcomes[0]
-		elif case_value in self.alphabet.consonants:
-			event_name = self.outcomes[1]
-		elif case_value in self.alphabet.spaces:
-			event_name = self.outcomes[2]
-		else:
-			event_name = self.outcomes[3]
+		event_name: str = self.case_map(case_value)
+
 		# Get next branch
 		branch = branch.get_branch(event_name)
 		branch.value += 1
@@ -72,6 +80,27 @@ class SearchVowels(tree.Branch):
 		if len(list_cases) > 0:
 			self.update_tree(list_cases, branch)
 
+	def build_from_chain(self, length: int, include_spaces: bool) -> str:
+		generated_text: str = ""
+		generator_index: int = 0
+
+		while generator_index < length:
+			# Pathing the good branch
+			branch: tree.Branch = self
+			for depth in range(-self.rank + 1, 0, 1):
+				# Check if the position even exists
+				if generator_index + depth >= 0:
+					char: str = generated_text[generator_index + depth]
+					event: str = self.case_map(char)
+					branch = branch.get_branch(event)
+			# Computing the character
+			r: int = random.randint(1, self.value)
+			
+
+
+			generator_index += 1
+
+		return generated_text
 
 if __name__ == "__main__":
 	print("MARKOV CHAIN.")

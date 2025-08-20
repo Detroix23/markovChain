@@ -30,7 +30,7 @@ if __name__ == '__main__':
 	print(f'# MAKAROV CHAIN')
 	print(f'## Usage in text recognition')
 
-	text_simple_1: str = "Salut tout le monde !"
+	text_simple_1: str = "Salut tout le monde"
 	search_vowels_fr: vowels.SearchVowels = vowels.SearchVowels(depth=2, alphabet=alphabets["fr"])
 	search_vowels_fr.analyse(text_simple_1)
 	search_vowels_fr.display_all_children()
