@@ -88,14 +88,14 @@ class BranchBonzai:
 
 		return branch
 	
-	def next_to_dict(self, exponent: float = 1.0, factor: float = 1) -> dict[str, int]:
+	def next_to_dict(self, exponent: float = 1.0, factor: float = 1) -> dict[str, float]:
 		"""
 		Return a dict where all event are linked with their rate of apparence.
 		The value is then operated: `factor * value ^ exponent`.
 		"""
-		next_dict: dict[str, int] = {}
+		next_dict: dict[str, float] = {}
 		for branch in self.next_branches:
-			next_dict[branch.event] = factor * branch.value ** exponent
+			next_dict[branch.event] = factor * float(branch.value) ** exponent
 
 		return next_dict
 

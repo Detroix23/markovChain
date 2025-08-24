@@ -1,2 +1,5 @@
-
+# Python and IDE related
+/__pycache__
 /.idea
+/.vscode
+

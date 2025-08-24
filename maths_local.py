@@ -9,18 +9,19 @@ import random
 
 class Random:
     @staticmethod
-    def choice_pondered(choices: dict[str, int]) -> str:
+    def choice_pondered(choices: dict[str, float]) -> str:
         """
         Choose a random string from a dict[string, weight]
         """
-        flatten_choices: list[str] = []
-        for choice, weight in choices.items():
-            for _ in range(round(weight)):
-                flatten_choices.append(choice)
+        ponder_total: float = sum(choices.values())
+        r: float = random.uniform(0, ponder_total)
+        ponder_actual: float = 0
+        for choice, ponder in choices.items():
+            if ponder_actual <= r < ponder_actual + ponder:
+                return choice
+            ponder_actual += ponder
+        raise Exception(f"(X) maths_local.choice_pondered - R number didn't choose anything (r={r}, ponder_total={ponder_total}).")
 
-        random_index: int = random.randint(0, len(flatten_choices) - 1)
-
-        return flatten_choices[random_index]
 
     @staticmethod
     def choice_flat(choices: list[str]) -> str:

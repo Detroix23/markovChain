@@ -118,7 +118,7 @@ class VowelsBonzai(tree.BranchBonzai):
 				branch = branch.get_branch(event)
 			
 			# Computing the character
-			next_events: dict[str, int] = branch.next_to_dict()
+			next_events: dict[str, float] = branch.next_to_dict()
 			if not include_spaces:
 				next_events.pop(self.outcomes[2], None)
 			next_events.pop(self.outcomes[3], None)

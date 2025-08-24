@@ -119,7 +119,7 @@ class LettersBonzai(tree.BranchBonzai):
 				branch = branch.get_branch(event)
 			
 			# Computing the character
-			next_events: dict[str, int] = branch.next_to_dict(exponent)
+			next_events: dict[str, float] = branch.next_to_dict(exponent, factor)
 			if not include_spaces:
 				next_events.pop(self.outcomes[0], None)
 			character_new: str = maths_local.Random.choice_pondered(next_events)
