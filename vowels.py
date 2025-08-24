@@ -2,13 +2,13 @@
 MARKOV CHAIN
 Search vowels
 """
-import random
 import tree
 import natural_language as lang
+import maths_local
 # from typing_extensions import Self
 
 
-class SearchVowels(tree.Branch):
+class Vowels(tree.BranchBonzai):
 	"""
 	Contain all search static methods, for the sake of organization.
 	"""
@@ -33,7 +33,7 @@ class SearchVowels(tree.Branch):
 		
 		return event_name
 
-	def analyse(self, text: str) -> tree.Branch:
+	def analyse(self, text: str) -> tree.BranchBonzai:
 		"""
 		Function: Establish the probability chain from moving between consonants and vowels. Additive to previous results
 		:param text: string to analyze.
@@ -60,9 +60,9 @@ class SearchVowels(tree.Branch):
 
 		return self
 	
-	def update_tree(self, list_cases: list[str], branch_in: tree.Branch|None = None):
+	def update_tree(self, list_cases: list[str], branch_in: tree.BranchBonzai|None = None):
 		# Default
-		branch: tree.Branch
+		branch: tree.BranchBonzai
 		if branch_in is None:
 			branch = self
 		else:
@@ -81,23 +81,37 @@ class SearchVowels(tree.Branch):
 			self.update_tree(list_cases, branch)
 
 	def build_from_chain(self, length: int, include_spaces: bool) -> str:
-		generated_text: str = ""
+		generated_text: str = " "
 		generator_index: int = 0
 
 		while generator_index < length:
 			# Pathing the good branch
-			branch: tree.Branch = self
-			for depth in range(-self.rank + 1, 0, 1):
+			branch: tree.BranchBonzai = self
+			for depth in range(-branch.rank - 1, 0, 1):
 				# Check if the position even exists
-				if generator_index + depth >= 0:
-					char: str = generated_text[generator_index + depth]
-					event: str = self.case_map(char)
-					branch = branch.get_branch(event)
-			# Computing the character
-			r: int = random.randint(1, self.value)
+				if generator_index + depth < 0:
+					break
+				char: str = generated_text[generator_index + depth]
+				event: str = self.case_map(char)
+				branch = branch.get_branch(event)
 			
+			# Computing the character
+			next_events: dict[str, int] = branch.next_to_dict()
+			if not include_spaces:
+				next_events.pop(self.outcomes[2], None)
+			next_events.pop(self.outcomes[3], None)
 
-
+			character_type: str = maths_local.Random.choice_pondered(next_events)
+			character_new: str
+			if character_type == self.outcomes[0]:
+				character_new = maths_local.Random.choice_flat(self.alphabet.vowels)
+			elif character_type == self.outcomes[1]:
+				character_new = maths_local.Random.choice_flat(self.alphabet.consonants)
+			else:
+				character_new = " "
+			
+			generated_text += character_new
+			
 			generator_index += 1
 
 		return generated_text

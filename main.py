@@ -31,6 +31,15 @@ if __name__ == '__main__':
 	print(f'## Usage in text recognition')
 
 	text_simple_1: str = "Salut tout le monde"
-	search_vowels_fr: vowels.SearchVowels = vowels.SearchVowels(depth=2, alphabet=alphabets["fr"])
+	# Search vowels for French texts.
+	search_vowels_fr: vowels.Vowels = vowels.Vowels(depth=2, alphabet=alphabets["fr"])
+	
 	search_vowels_fr.analyse(text_simple_1)
+	with open("./assets/LesTroisMousquetaires.txt", "r", encoding="utf-8") as f:
+		search_vowels_fr.analyse(f.read())
+	
 	search_vowels_fr.display_all_children()
+	
+	for _ in range(50):
+		build: str = search_vowels_fr.build_from_chain(15, include_spaces=True)
+		print(f"{build=}")

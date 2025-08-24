@@ -11,10 +11,11 @@ from enum import Enum
 class Settings(Enum):
 	SELF = 1
 
-class Branch:
+class BranchBonzai:
 	"""
 	Tree like system.
 	The rank 0 is the root.
+	Bonzai because it is not scalable, and do not use Numpy.
 	"""
 	def __init__(self, outcomes_possible: list[str], depth: int, event: str = "root", rank: int = 0) -> None:
 		"""
@@ -59,7 +60,7 @@ class Branch:
 		next_branches: list[Self] = []
 		for outcome in outcomes:
 			if depth > 0:
-				next_branches.append(Branch(outcomes, depth - 1, outcome, rank + 1)) # type: ignore
+				next_branches.append(BranchBonzai(outcomes, depth - 1, outcome, rank + 1)) # type: ignore
 
 		return next_branches
 
@@ -86,7 +87,12 @@ class Branch:
 
 		return branch
 	
+	def next_to_dict(self) -> dict[str, int]:
+		next_dict: dict[str, int] = {}
+		for branch in self.next_branches:
+			next_dict[branch.event] = branch.value
 
+		return next_dict
 
 if __name__ == "__main__":
 	print("MARKOV CHAIN.")
@@ -94,12 +100,12 @@ if __name__ == "__main__":
 
 	outcomes1: list[str] = ["a", "b", "c", "d"]
 	depth1: int = 2
-	tree1: Branch = Branch(outcomes1, depth1)
+	tree1: BranchBonzai = BranchBonzai(outcomes1, depth1)
 	tree1.display_all_children()
-	branch1_1: Branch = tree1.get_branch(outcomes1[0])
-	branch1_2: Branch = tree1.get_branch(outcomes1[0], repeat=2)
-	branch1_3: Branch = branch1_1.get_branch(outcomes1[1])
-	branch1_4: Branch = tree1.get_branch(outcomes1[0]).get_branch(outcomes1[0])
+	branch1_1: BranchBonzai = tree1.get_branch(outcomes1[0])
+	branch1_2: BranchBonzai = tree1.get_branch(outcomes1[0], repeat=2)
+	branch1_3: BranchBonzai = branch1_1.get_branch(outcomes1[1])
+	branch1_4: BranchBonzai = tree1.get_branch(outcomes1[0]).get_branch(outcomes1[0])
 
 	print(f"Branches: \n\t{branch1_1=}, \n\t{branch1_2=}, \n\t{branch1_3=}, \n\t{branch1_4=}")
 	print(f"Cmp: {branch1_2 == branch1_4}")
