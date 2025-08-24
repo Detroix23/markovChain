@@ -7,9 +7,10 @@ Probabilities of letter, syllable and words.
 - The state of AI today (2025);
 """
 
-import vowels
+import vowels # type: ignore
+import letters # type: ignore
 import natural_language as lang
-
+import random
 
 
 alphabets: dict[str, lang.Alphabet] = {
@@ -30,16 +31,41 @@ if __name__ == '__main__':
 	print(f'# MAKAROV CHAIN')
 	print(f'## Usage in text recognition')
 
+	"""
+	print("### Search vowels for French texts.")
+	search_vowels_fr: vowels.VowelsBonzai = vowels.VowelsBonzai(depth=3, alphabet=alphabets["fr"])
 	text_simple_1: str = "Salut tout le monde"
-	# Search vowels for French texts.
-	search_vowels_fr: vowels.Vowels = vowels.Vowels(depth=2, alphabet=alphabets["fr"])
-	
 	search_vowels_fr.analyse(text_simple_1)
 	with open("./assets/LesTroisMousquetaires.txt", "r", encoding="utf-8") as f:
 		search_vowels_fr.analyse(f.read())
 	
 	search_vowels_fr.display_all_children()
 	
-	for _ in range(50):
+	build_quantity: int = 50
+	print(f"## Builds ({build_quantity})")
+	for _ in range(build_quantity):
 		build: str = search_vowels_fr.build_from_chain(15, include_spaces=True)
-		print(f"{build=}")
+		print(f"{build}")
+	"""
+	print("### Search letter combinations for French texts.")
+	search_letters_fr: letters.LettersBonzai = letters.LettersBonzai(
+		depth=4, 
+		alphabet=alphabets["fr"]
+	)
+	text_simple_1: str = "Salut tout le monde"
+	search_letters_fr.analyse(text_simple_1)
+	with open("./assets/LesTroisMousquetaires.txt", "r", encoding="utf-8") as f:
+		search_letters_fr.analyse(f.read())
+	
+	search_letters_fr.display_all_children()
+	
+	build_quantity: int = 50
+	print(f"## Builds ({build_quantity})")
+	for _ in range(build_quantity):
+		build: str = search_letters_fr.build_from_chain(
+			random.randint(10, 40),
+			include_spaces=True,
+			exponent=1.1,
+			factor=0.5
+		)
+		print(f"{build}")

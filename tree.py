@@ -7,6 +7,7 @@ Tree module
 # Tree class
 from typing_extensions import Self
 from enum import Enum
+import numpy
 
 class Settings(Enum):
 	SELF = 1
@@ -39,7 +40,7 @@ class BranchBonzai:
 	def __repr__(self) -> str:
 		return f"Branch: event={self.event}, value={self.value}, rank={self.rank}, child_quantity={len(self.next_branches)}"
 
-	def display_all_children(self) -> None:
+	def display_all_children(self, depth: int = 2) -> None:
 		"""
 		Debug temporary command prompt display of the object and its children. 
 		"""
@@ -48,8 +49,8 @@ class BranchBonzai:
 			print("  ", end="")
 		print(f"r{self.rank} '{self.event}': {self.value}", end=";\n")
 		for child in self.next_branches:
-			if child.next_branches:
-				child.display_all_children()
+			if child.next_branches and depth > 1:
+				child.display_all_children(depth - 1)
 			else:
 				for _ in range(0, child.rank):
 					print("  ", end="")
@@ -87,17 +88,44 @@ class BranchBonzai:
 
 		return branch
 	
-	def next_to_dict(self) -> dict[str, int]:
+	def next_to_dict(self, exponent: float = 1.0, factor: float = 1) -> dict[str, int]:
+		"""
+		Return a dict where all event are linked with their rate of apparence.
+		The value is then operated: `factor * value ^ exponent`.
+		"""
 		next_dict: dict[str, int] = {}
 		for branch in self.next_branches:
-			next_dict[branch.event] = branch.value
+			next_dict[branch.event] = factor * branch.value ** exponent
 
 		return next_dict
 
-if __name__ == "__main__":
-	print("MARKOV CHAIN.")
-	print("Tree module")
 
+
+
+class Tree:
+	"""
+	# Tree class, based on numpy arrays.
+	Because numpay arrays dont have keys, the probability of an event is **directly linked to the numpy array and event list index**. 
+	"""
+	def __init__(self, events: list[str], depth: int, numpy_dtype: str):
+		self.events: list[str] = events
+		self.length: int = len(self.events)
+		self.depth: int = depth
+		# Generate the array of d (depth) dimension.
+		self.branches: numpy.ndarray = numpy.zeros(
+			tuple(self.length for _ in range(self.depth)), 
+			dtype=numpy_dtype
+		)
+
+
+
+
+if __name__ == "__main__":
+	print("# MARKOV CHAIN.")
+	print("Tree module.")
+
+
+	print("## Bonzai tree.")
 	outcomes1: list[str] = ["a", "b", "c", "d"]
 	depth1: int = 2
 	tree1: BranchBonzai = BranchBonzai(outcomes1, depth1)
@@ -109,3 +137,11 @@ if __name__ == "__main__":
 
 	print(f"Branches: \n\t{branch1_1=}, \n\t{branch1_2=}, \n\t{branch1_3=}, \n\t{branch1_4=}")
 	print(f"Cmp: {branch1_2 == branch1_4}")
+
+	print("# Numpy tree")
+	events = ["a", "b", "c"]
+	depth = 2
+	numpy_dtype = 'int16'
+	tree2: Tree = Tree(events, depth, numpy_dtype)
+	print(tree2.branches)
+

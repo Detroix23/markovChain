@@ -8,13 +8,12 @@ import maths_local
 # from typing_extensions import Self
 
 
-class VowelsBonzai(tree.BranchBonzai):
+class LettersBonzai(tree.BranchBonzai):
 	"""
 	Contain all search static methods, for the sake of organization.
 	"""
-
 	def __init__(self, depth: int, alphabet: lang.Alphabet) -> None:
-		self.outcomes: list[str] = ["vowel", "consonant", "space", "special"]
+		self.outcomes: list[str] = [' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 		self.alphabet: lang.Alphabet = alphabet
 		self.root_name: str = "total"
 		self.root_position: int = 0
@@ -26,16 +25,15 @@ class VowelsBonzai(tree.BranchBonzai):
 		super().__init__(self.outcomes, depth, self.root_name, self.root_position)
 
 	def case_map(self, case_value: str) -> str:
-		event_name: str
-		if case_value in self.alphabet.vowels:
-			event_name = self.outcomes[0]
-		elif case_value in self.alphabet.consonants:
-			event_name = self.outcomes[1]
-		elif case_value in self.alphabet.spaces:
-			event_name = self.outcomes[2]
+		"""
+		For a given case, return the event name.
+		"""
+		event_name: str = ""
+		if case_value in self.outcomes:
+			event_name = case_value
 		else:
-			event_name = self.outcomes[3]
-		
+			raise ValueError(f"Event name not a letter: {case_value}")
+
 		return event_name
 
 	def analyse(self, text: str) -> tree.BranchBonzai:
@@ -58,7 +56,7 @@ class VowelsBonzai(tree.BranchBonzai):
 				# Validation.
 				character_valid: bool = True
 				character: str = text[reader_index + sub_index].lower()
-				if self.filter_special and character not in (self.alphabet.lowers + self.alphabet.spaces):
+				if character not in self.outcomes:
 					character_valid = False
 				elif reader_index + sub_index < len(text) - 1:
 					if (self.filer_double_spaces
@@ -102,7 +100,10 @@ class VowelsBonzai(tree.BranchBonzai):
 			self.update_tree(list_cases, branch)
 
 	
-	def build_from_chain(self, length: int, include_spaces: bool) -> str:
+	def build_from_chain(self, length: int, include_spaces: bool, exponent: float, factor: float) -> str:
+		"""
+		Generate a chain of character based on the probability table, obtained by `analysing`.
+		"""
 		generated_text: str = " "
 		generator_index: int = 0
 
@@ -118,33 +119,12 @@ class VowelsBonzai(tree.BranchBonzai):
 				branch = branch.get_branch(event)
 			
 			# Computing the character
-			next_events: dict[str, int] = branch.next_to_dict()
+			next_events: dict[str, int] = branch.next_to_dict(exponent)
 			if not include_spaces:
-				next_events.pop(self.outcomes[2], None)
-			next_events.pop(self.outcomes[3], None)
-
-			character_type: str = maths_local.Random.choice_pondered(next_events)
-			character_new: str
-			if character_type == self.outcomes[0]:
-				character_new = maths_local.Random.choice_flat(self.alphabet.vowels)
-			elif character_type == self.outcomes[1]:
-				character_new = maths_local.Random.choice_flat(self.alphabet.consonants)
-			else:
-				character_new = " "
-			
+				next_events.pop(self.outcomes[0], None)
+			character_new: str = maths_local.Random.choice_pondered(next_events)
 			generated_text += character_new
 			
 			generator_index += 1
 
 		return generated_text
-
-
-class Vowels(tree.Tree):
-	pass
-
-
-
-if __name__ == "__main__":
-	print("MARKOV CHAIN.")
-	print("Vowels testing")
-

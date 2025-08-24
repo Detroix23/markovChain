@@ -15,7 +15,7 @@ class Random:
         """
         flatten_choices: list[str] = []
         for choice, weight in choices.items():
-            for _ in range(weight):
+            for _ in range(round(weight)):
                 flatten_choices.append(choice)
 
         random_index: int = random.randint(0, len(flatten_choices) - 1)
